@@ -3,12 +3,22 @@
 
 using namespace std;
 
-int BOARD_SIZE = 3;
-
 #include <iostream>
 #include <iomanip>
 
 using namespace std;
+
+int getUserBoardSize() {
+    int boardSize;
+    cout << "What size board do you want to play? (0 to exit) ";
+    cin >> boardSize;
+
+    if (boardSize == 0) {
+        exit(0);
+    }
+
+    return boardSize;
+}
 
 void drawBoard(char** board, int size) {
     cout << "  ";
@@ -64,11 +74,12 @@ void deallocateBoard(char** board, int size) {
 
 
 int main() {
-    char** board = initializeBoard(BOARD_SIZE);
+    int boardSize = getUserBoardSize();
+    char** board = initializeBoard(boardSize);
 
-    drawBoard(board, BOARD_SIZE);
+    drawBoard(board, boardSize);
 
     // When the game is over or the program exits
-    deallocateBoard(board, BOARD_SIZE);
+    deallocateBoard(board, boardSize);
     return 0;
 }

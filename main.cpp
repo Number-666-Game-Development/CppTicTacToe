@@ -8,6 +8,44 @@ using namespace std;
 
 using namespace std;
 
+bool isDraw(char** board, int size) {
+    for (int row = 0; row < size; ++row) {
+        for (int col = 0; col < size; ++col) {
+            if (board[row][col] == ' ') {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool checkWin(char** board, int size, char currentPlayer) {
+    // Check rows and columns
+    for (int i = 0; i < size; ++i) {
+        // Check row i
+        if (board[i][0] == currentPlayer && board[i][1] == currentPlayer && board[i][2] == currentPlayer) {
+            return true; // Current player has won
+        }
+
+        // Check column i
+        if (board[0][i] == currentPlayer && board[1][i] == currentPlayer && board[2][i] == currentPlayer) {
+            return true; // Current player has won
+        }
+    }
+
+    // Check main diagonal
+    if (board[0][0] == currentPlayer && board[1][1] == currentPlayer && board[2][2] == currentPlayer) {
+        return true; // Current player has won
+    }
+
+    // Check anti-diagonal
+    if (board[0][2] == currentPlayer && board[1][1] == currentPlayer && board[2][0] == currentPlayer) {
+        return true; // Current player has won
+    }
+
+    return false; // No win condition found
+}
+
 int getUserBoardSize() {
     int boardSize;
     cout << "What size board do you want to play? (0 to exit) ";
@@ -72,14 +110,61 @@ void deallocateBoard(char** board, int size) {
     delete[] board;
 }
 
+bool isValidMove(char** board, int size, int row, int col) {
+    if (row >= 1 && row <= size && col >=1 && col <= size) {
+        if (board[row - 1][col - 1] == ' ') {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 int main() {
-    int boardSize = getUserBoardSize();
-    char** board = initializeBoard(boardSize);
+    char** board;
+    int boardSize;
+    bool gameOver;
+    char currentPlayer = 'X';
 
-    drawBoard(board, boardSize);
+    do {
+        boardSize = getUserBoardSize();
+        board = initializeBoard(boardSize);
+        gameOver = false;
 
-    // When the game is over or the program exits
-    deallocateBoard(board, boardSize);
+        drawBoard(board, boardSize);
+        do {
+            int row, col;
+            cout << "Player " << currentPlayer << ", enter your move (Row): ";
+            cin >> row;
+            cout << "Player " << currentPlayer << ", enter your move (Column): ";
+            cin >> col;
+
+            if (isValidMove(board, boardSize, row, col)) {
+                board[row - 1][col - 1] = currentPlayer; // Assign player's move
+
+                if (checkWin(board, boardSize, currentPlayer)) {
+                    drawBoard(board, boardSize); // Display the final winning board
+                    cout << "Player " << currentPlayer << " wins!" << endl;
+                    gameOver = true;
+                } else if (isDraw(board, boardSize)) {
+                    drawBoard(board, boardSize); // Display the final drawn board
+                    cout << "It's a draw!" << endl;
+                    gameOver = true;
+                } else {
+                    currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+                }
+
+                drawBoard(board, boardSize);
+            } else {
+                cout << "Invalid move. Try again." << endl;
+            }
+
+        } while(!gameOver);
+
+        // When the game is over or the program exits
+        deallocateBoard(board, boardSize);
+
+    } while (true);
+
     return 0;
 }
